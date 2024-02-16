@@ -40,11 +40,8 @@ fn get_sum_from_all_lines(filename: &str) -> u32 {
   let mut result  = 0;
 
   for line in read_to_string(filename).unwrap().lines() {
-    let gameidx = get_gameindex_from_line(line);
-    let rgb = get_rgb(line);
-    if is_game_possible(rgb){
-      result += gameidx;
-    }
+    let rgb = get_rgb(line);    
+    result += rgb.0*rgb.1*rgb.2;
   }
   return result
 }
