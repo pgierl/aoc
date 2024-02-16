@@ -1,53 +1,55 @@
-use std::fs::read_to_string;
+use std::{cmp::max, fs::read_to_string};
 
-//get first integer from string
-// a1b2c3d4e5f returns 1+5 -> 15
-fn get_sum_first_last_int(line: &str) -> u32
+fn get_gameindex_from_line(line: &str) -> u32
 {
-  let first_int = line.chars().find(char::is_ascii_digit);
-  let first_char: char =    match first_int {
-    Some(value) =>  value,
-    None => ' '
-  };
-  let last_int = line.chars().rfind(char::is_ascii_digit);
-  let last_char: char =    match last_int {
-    Some(value) =>  value,
-    None => ' '
-  };
-  let mut string_both_chars = String::from("");
-  string_both_chars.push(first_char);
-  string_both_chars.push(last_char);
-  return string_both_chars.parse().unwrap()
+  let gametext = line.strip_prefix("Game ").unwrap().split_once(":");
+  gametext.unwrap().0.parse().unwrap()
 }
 
-//get first integer from string
-// eightwothree returns -> 83
-// xtwone3four ->24
-fn get_sum_first_last_int_vals_as_word(line: &str) -> u32
+fn get_rgb(line: &str) -> (u32,u32,u32)
 {
-  let mut tmp = line.replace("one", "one1one");
-  tmp = tmp.replace("two", "two2two");
-  tmp = tmp.replace("three", "three3three");
-  tmp = tmp.replace("four", "four4four");
-  tmp = tmp.replace("five", "five5five");
-  tmp = tmp.replace("six", "six6six");
-  tmp = tmp.replace("seven", "seven7seven");
-  tmp = tmp.replace("eight", "eight8eight");
-  tmp = tmp.replace("nine", "nine9nine");
-  return get_sum_first_last_int(&tmp);
+  let mut red = 0;
+  let mut green = 0;
+  let mut blue = 0;
+  let rolls= line.split_once(":").unwrap().1.split(";");
+  for roll in rolls {
+    let onecolor = roll.split(",");
+    for num_plus_color in onecolor {
+      let split = num_plus_color.strip_prefix(" ").unwrap().split_once(" ");
+      let curr_num = split.unwrap().0.parse().unwrap();
+      let curr_color = split.unwrap().1;
+      match curr_color {
+        "green"=> green = max(green, curr_num),
+        "red"=> red = max(red, curr_num),
+        "blue"=> blue = max(blue, curr_num),
+        &_ => todo!()          
+      }
+    }
+  }
+  (red,green,blue)
 }
 
+fn is_game_possible (rgb:(u32,u32,u32)) -> bool{
+  let max_red = 12;
+  let max_green = 13;
+  let max_blue = 14;
+  rgb.0 <= max_red && rgb.1 <= max_green && rgb.2 <= max_blue
+}
 
 fn get_sum_from_all_lines(filename: &str) -> u32 {
   let mut result  = 0;
+
   for line in read_to_string(filename).unwrap().lines() {
-    println!("{} = {}", line.to_string(), get_sum_first_last_int_vals_as_word(&line));
-    result += get_sum_first_last_int_vals_as_word(&line)
+    let gameidx = get_gameindex_from_line(line);
+    let rgb = get_rgb(line);
+    if is_game_possible(rgb){
+      result += gameidx;
+    }
   }
   return result
 }
 
 fn main() {
-  let _a = get_sum_from_all_lines("1.txt");  
+  let _a = get_sum_from_all_lines("games.txt");  
   println!("total result {}", _a);
 }
