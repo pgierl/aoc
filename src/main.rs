@@ -20,16 +20,34 @@ fn get_sum_first_last_int(line: &str) -> u32
   return string_both_chars.parse().unwrap()
 }
 
+//get first integer from string
+// eightwothree returns -> 83
+// xtwone3four ->24
+fn get_sum_first_last_int_vals_as_word(line: &str) -> u32
+{
+  let mut tmp = line.replace("one", "one1one");
+  tmp = tmp.replace("two", "two2two");
+  tmp = tmp.replace("three", "three3three");
+  tmp = tmp.replace("four", "four4four");
+  tmp = tmp.replace("five", "five5five");
+  tmp = tmp.replace("six", "six6six");
+  tmp = tmp.replace("seven", "seven7seven");
+  tmp = tmp.replace("eight", "eight8eight");
+  tmp = tmp.replace("nine", "nine9nine");
+  return get_sum_first_last_int(&tmp);
+}
+
+
 fn get_sum_from_all_lines(filename: &str) -> u32 {
   let mut result  = 0;
   for line in read_to_string(filename).unwrap().lines() {
-    println!("{} = {}", line.to_string(), get_sum_first_last_int(&line));
-    result += get_sum_first_last_int(&line)
+    println!("{} = {}", line.to_string(), get_sum_first_last_int_vals_as_word(&line));
+    result += get_sum_first_last_int_vals_as_word(&line)
   }
   return result
 }
 
 fn main() {
-  let _a = get_sum_from_all_lines("example.txt");  
+  let _a = get_sum_from_all_lines("1.txt");  
   println!("total result {}", _a);
 }
